@@ -1,7 +1,3 @@
-import datetime
-import math
-import time
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,28 +9,39 @@ from xgboost import XGBRegressor
 # add feature importance 
 # only sell if probability is high
 # fixed training window
-# go backwards
-
+# invest fixed amount of money
+# start date
+# load validation weights in
+# add more info to simulation info
+# add final predict
+# Try new hyper parameter optimisation?
 
 class Model_Dev:
-    def __init__(self, X, Y, Y_closing_prices,train_test_split=0.8):
+    def __init__(self, X, Y, Y_closing_prices, X_current, train_test_split=0.8, hyperparams=None):
         self.prediction_window = 5 # fix this!
         self.X = X
         self.Y = Y
         self.Y_closing_prices = Y_closing_prices
+        self.X_current = X_current.reshape(-1,X_current.shape[0])
         self.n = int(self.X.shape[0]*train_test_split)
 
         self.stocks = 5
         self.money = 0
 
-    def walkthrough_train_test_split(self, i):
+        # If there is no hyper parameter's given we use walkthrough validation to find optimal hyper parameters
+        if hyperparams:
+            self.best_params = hyperparams
+        else:
+            self.__validate()
+
+    def __walkthrough_train_test_split(self, i):
         # Return X_train, Y_train, X_test, Y_test, Y_closing_pries_test
         return self.X[:self.n+i,:], self.Y[:self.n+i], self.X[self.n+i:,:], self.Y[self.n+i:], self.Y_closing_prices[self.n+i:]
 
-    def validate(self):
+    def __validate(self):
         # Hyperparameter tunning
         # chnage this to do all but last 5?
-        X_train, Y_train, _,_,_ = self.walkthrough_train_test_split(0)         
+        X_train, Y_train, _,_,_ = self.__walkthrough_train_test_split(0)         
         params = {
                 'min_child_weight': [1, 5, 10],
                 'gamma': [0.5, 1, 1.5, 2, 5],
@@ -52,7 +59,7 @@ class Model_Dev:
         xgb_grid.fit(X_train,Y_train)
         self.best_params = xgb_grid.best_params_
     
-    def train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
+    def __train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
         
         model = XGBRegressor(**self.best_params)
         model.fit(X_train, Y_train)
@@ -100,8 +107,8 @@ class Model_Dev:
         self.acc = []
         for i in range(0,self.X.shape[0]-self.n,self.prediction_window):
 
-            X_train, Y_train, X_test, Y_test, Y_closing_pries_test = self.walkthrough_train_test_split(i)
-            BinaryPredicted, BinaryActual, ActualStockClosingPrice = self.train_and_predict_step(X_train, Y_train, X_test, Y_test, Y_closing_pries_test)
+            X_train, Y_train, X_test, Y_test, Y_closing_pries_test = self.__walkthrough_train_test_split(i)
+            BinaryPredicted, BinaryActual, ActualStockClosingPrice = self.__train_and_predict_step(X_train, Y_train, X_test, Y_test, Y_closing_pries_test)
             # classification error:
             self.preds.append(BinaryPredicted)
             self.acc.append(BinaryActual)
@@ -113,9 +120,15 @@ class Model_Dev:
         print(f'The starting Money was {self.starting_money} and the ending money was {self.ending_money} so the total profit would have been: £{self.ending_money-self.starting_money}')
         self.print_accuracy()
 
+    def predict(self):
+
+        self.model = XGBRegressor(**self.best_params)
+        self.model.fit(self.X, self.Y)
+
+        pred = self.model.predict(self.X_current)
+        
+        return pred
 
 
-X, Y, Y_closing_prices = data_cleaning_pipeline(df, =5)
 
-model = Model_Dev(X,Y,Y_closing_prices)
-model.validate()
+
