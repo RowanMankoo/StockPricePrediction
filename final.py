@@ -4,7 +4,7 @@ import pandas as pd
 import xgboost as xgboost
 from sklearn.metrics import mean_squared_error, accuracy_score
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
-from xgboost import XGBRegressor
+from xgboost import XGBClassifier
 
 # add feature importance 
 # only sell if probability is high
@@ -15,6 +15,8 @@ from xgboost import XGBRegressor
 # add more info to simulation info
 # add final predict
 # Try new hyper parameter optimisation?
+# double check money simulation walkthrough
+# include last 30 days of high?
 
 class Model_Dev:
     def __init__(self, X, Y, Y_closing_prices, X_current, train_test_split=0.8, hyperparams=None):
@@ -58,10 +60,13 @@ class Model_Dev:
                                 verbose=True)
         xgb_grid.fit(X_train,Y_train)
         self.best_params = xgb_grid.best_params_
+
+        with open('hyperparams.json','w') as fp:
+            json.dump(self.best_params,fp)
     
     def __train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
         
-        model = XGBRegressor(**self.best_params)
+        model = XGBClassifier(**self.best_params)
         model.fit(X_train, Y_train)
 
         BinaryPredicted = model.predict(X_test[0].reshape(-1,X_test.shape[1]))
@@ -75,7 +80,7 @@ class Model_Dev:
         if BinaryPredicted==0:
             if self.stocks!=0:
                 # If stocks are predicted to go down then sell
-                self.money += ActualStockClosingPrice*stocks
+                self.money += ActualStockClosingPrice*self.stocks
                 self.stocks = 0
             else:
                 pass
@@ -83,6 +88,15 @@ class Model_Dev:
             # If stocks are predicted to go up then buy
             self.stocks += self.money//ActualStockClosingPrice
             self.money -= (self.money//ActualStockClosingPrice)*ActualStockClosingPrice
+    
+    def feature_importance(self,columns):
+
+        # CHANGE THIS TO TRY CATCH STATEMENT
+        if self.__predict_has_been_called__:
+            return sorted(zip(self.model.feature_importances_,columns),reverse=True)
+        else:
+             raise ValueError('predict method has not been called yet')
+
 
     def visualise(self):
         
@@ -96,8 +110,8 @@ class Model_Dev:
     
     def print_accuracy(self):
 
-        preds = list(map(lambda x: 1 if x>0.5 else 0, self.preds))
-        print(accuracy_score(self.acc,preds))
+        #preds = list(map(lambda x: 1 if x>0.5 else 0, self.preds))
+        print(accuracy_score(self.acc,self.preds))
 
     def simulation_walkthrough(self):
 
@@ -122,7 +136,9 @@ class Model_Dev:
 
     def predict(self):
 
-        self.model = XGBRegressor(**self.best_params)
+        self.__predict_has_been_called__ = True
+
+        self.model = XGBClassifier(**self.best_params)
         self.model.fit(self.X, self.Y)
 
         pred = self.model.predict(self.X_current)

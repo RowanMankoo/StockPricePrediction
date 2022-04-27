@@ -1,5 +1,6 @@
 import datetime
 import time
+import json
 
 import numpy as np
 import pandas as pd
@@ -49,6 +50,15 @@ class Data:
         # Add 30DayStockPriceSum
         self.df['30DayStockPriceSum'] = self.df.iloc[:,6:].sum(axis=1)
     
+    def column_names(self):
+        """Return the column names in order
+
+        Returns:
+            _type_: _description_
+        """
+
+        return self.df.columns
+
     def X_Y_dataset_creation(self):
         """Generates a typical XY inputs and targets 
 
