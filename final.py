@@ -49,6 +49,9 @@ class ModelDev(data.Data):
         else:
             self.__validate()
 
+        # Fix this to be more neet
+        self.__simulation_walkthrough_has_been_called__ = False
+
     def __walkthrough_train_test_split(self, i):
         # Return X_train, Y_train, X_test, Y_test, Y_closing_pries_test
         return self.X[:self.n+i,:], self.Y[:self.n+i], self.X[self.n+i:,:], self.Y[self.n+i:], self.Y_closing_prices[self.n+i:]
@@ -126,7 +129,7 @@ class ModelDev(data.Data):
         self.preds = []
         self.acc = []
         self.probs = []
-        for i in range(0,self.X.shape[0]-self.n,self.prediction_window):
+        for i in range(0,self.X.shape[0]-self.n,self.steps):
 
             X_train, Y_train, X_test, Y_test, Y_closing_pries_test = self.__walkthrough_train_test_split(i)
             BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob = self.__train_and_predict_step(X_train, Y_train, X_test, Y_test, Y_closing_pries_test)
@@ -145,6 +148,11 @@ class ModelDev(data.Data):
         self.__simulation_walkthrough_has_been_called__ = True
 
     def visualise_correct_incorrect_probs(self):
+
+        if self.__simulation_walkthrough_has_been_called__:
+            pass
+        else:
+            raise ValueError('simulation_walkthrough method has not been called yet')
 
         correct = []
         incorrect = []
@@ -178,6 +186,11 @@ class ModelDev(data.Data):
         plt.show()
 
     def visualise_class_probs(self):
+
+        if self.__simulation_walkthrough_has_been_called__:
+            pass
+        else:
+            raise ValueError('simulation_walkthrough method has not been called yet')
 
         increased = []
         decreased = []
