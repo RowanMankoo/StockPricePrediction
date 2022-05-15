@@ -4,3 +4,8 @@
 - previous 30 days closing prices added
 - pulls in yahoo finance data
 - includes a money simulation which will use walkthrough training to estimate how much money you would gain/lose after x days of trading with standard stratergy
+- can stor hyper params as takes long to find them
+- can show feature importance
+- deales with class imbalance
+
+'added class balancing technique along with visulisation method of predicted probabilities'

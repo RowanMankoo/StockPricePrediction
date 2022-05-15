@@ -1,22 +1,24 @@
+import json
+from collections import Counter
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xgboost as xgboost
-from sklearn.metrics import mean_squared_error, accuracy_score
+from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from xgboost import XGBClassifier
 
-# add feature importance 
+# develop feature importance functionality
 # only sell if probability is high
 # fixed training window
 # invest fixed amount of money
 # start date
-# load validation weights in
 # add more info to simulation info
-# add final predict
+# polish final predict
 # Try new hyper parameter optimisation?
 # double check money simulation walkthrough
-# include last 30 days of high?
+### include last 30 days of high?
 
 class Model_Dev:
     def __init__(self, X, Y, Y_closing_prices, X_current, train_test_split=0.8, hyperparams=None):
@@ -26,6 +28,9 @@ class Model_Dev:
         self.Y_closing_prices = Y_closing_prices
         self.X_current = X_current.reshape(-1,X_current.shape[0])
         self.n = int(self.X.shape[0]*train_test_split)
+
+        counter = Counter(Y)
+        self.weighting = counter[0]/counter[1]
 
         self.stocks = 5
         self.money = 0
@@ -52,7 +57,7 @@ class Model_Dev:
                 'max_depth': [3, 4, 5]
                 }
 
-        xgb1 = xgboost.XGBClassifier()
+        xgb1 = xgboost.XGBClassifier(scale_pos_weight=self.weighting)
         xgb_grid = GridSearchCV(xgb1,
                                 params,
                                 cv = TimeSeriesSplit(),
@@ -66,14 +71,15 @@ class Model_Dev:
     
     def __train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
         
-        model = XGBClassifier(**self.best_params)
+        model = XGBClassifier(**self.best_params, scale_pos_weight=self.weighting)
         model.fit(X_train, Y_train)
 
         BinaryPredicted = model.predict(X_test[0].reshape(-1,X_test.shape[1]))
+        prob = model.predict_proba(X_test[0].reshape(-1,X_test.shape[1]))
         BinaryActual = Y_test[0]  
         ActualStockClosingPrice = Y_closing_prices_test[0]
 
-        return BinaryPredicted, BinaryActual, ActualStockClosingPrice
+        return BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob
     
     def money_simulation(self, BinaryPredicted, ActualStockClosingPrice):
 
@@ -119,13 +125,15 @@ class Model_Dev:
 
         self.preds = []
         self.acc = []
+        self.probs = []
         for i in range(0,self.X.shape[0]-self.n,self.prediction_window):
 
             X_train, Y_train, X_test, Y_test, Y_closing_pries_test = self.__walkthrough_train_test_split(i)
-            BinaryPredicted, BinaryActual, ActualStockClosingPrice = self.__train_and_predict_step(X_train, Y_train, X_test, Y_test, Y_closing_pries_test)
+            BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob = self.__train_and_predict_step(X_train, Y_train, X_test, Y_test, Y_closing_pries_test)
             # classification error:
             self.preds.append(BinaryPredicted)
             self.acc.append(BinaryActual)
+            self.probs.append(prob)
 
             self.money_simulation(BinaryPredicted, ActualStockClosingPrice)
 
@@ -138,7 +146,7 @@ class Model_Dev:
 
         self.__predict_has_been_called__ = True
 
-        self.model = XGBClassifier(**self.best_params)
+        self.model = XGBClassifier(**self.best_params, scale_pos_weight=self.weighting)
         self.model.fit(self.X, self.Y)
 
         pred = self.model.predict(self.X_current)
