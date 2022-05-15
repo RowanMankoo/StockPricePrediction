@@ -9,8 +9,7 @@ from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from xgboost import XGBClassifier
 
-import data
-
+from scripts import data
 # develop feature importance functionality
 # only sell if probability is high
 # fixed training window
@@ -23,6 +22,11 @@ import data
 ### include last 30 days of high?
 # Venv
 # progress bars or print init statements
+### ADD WEEKEND INDICATOR!
+# add classification statistics
+# add fractional shares
+# add testing
+# try violin plot for visualise_class_probs
 
 class ModelDev(data.Data):
     def __init__(self, company, steps, train_test_split=0.8, hyperparams=None):
@@ -38,11 +42,6 @@ class ModelDev(data.Data):
         counter = Counter(self.Y)
         self.weighting = counter[0]/counter[1]
 
-        # Used for money simulation
-        # MOVE THIS TO MONEY SIM METHOD
-        self.stocks = 5
-        self.money = 0
-
         # If there is no hyper parameter's given we use walkthrough validation to find optimal hyper parameters
         if hyperparams:
             self.best_params = hyperparams
@@ -52,13 +51,20 @@ class ModelDev(data.Data):
         # Fix this to be more neet
         self.__simulation_walkthrough_has_been_called__ = False
 
+        plt.style.use('seaborn')
+
+
     def __walkthrough_train_test_split(self, i):
-        # Return X_train, Y_train, X_test, Y_test, Y_closing_pries_test
+        """Splits dataset accoring to current step in walkthrough training programme
+
+        Returns:
+            X_train, Y_train, X_test, Y_test, Y_closing_pries_test
+        """
         return self.X[:self.n+i,:], self.Y[:self.n+i], self.X[self.n+i:,:], self.Y[self.n+i:], self.Y_closing_prices[self.n+i:]
 
     def __validate(self):
-        # Hyperparameter tunning
-        # chnage this to do all but last 5?
+        """Hyperparameter tuning
+        """
         X_train, Y_train, _,_,_ = self.__walkthrough_train_test_split(0)         
         params = {
                 'min_child_weight': [1, 5, 10],
@@ -81,7 +87,9 @@ class ModelDev(data.Data):
             json.dump(self.best_params,fp)
     
     def __train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
-        
+        """Trains an instance of our XGBoostClassifier at a current stage in our walkthrough training and then outputs prediction
+        """
+
         model = XGBClassifier(**self.best_params, scale_pos_weight=self.weighting)
         model.fit(X_train, Y_train)
 
@@ -93,6 +101,8 @@ class ModelDev(data.Data):
         return BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob
     
     def __money_simulation(self, BinaryPredicted, ActualStockClosingPrice):
+        """Calculates money loss/gain at a current walkthrough step
+        """
 
         if BinaryPredicted==0:
             if self.stocks!=0:
@@ -105,25 +115,16 @@ class ModelDev(data.Data):
             # If stocks are predicted to go up then buy
             self.stocks += self.money//ActualStockClosingPrice
             self.money -= (self.money//ActualStockClosingPrice)*ActualStockClosingPrice
-    
-    def feature_importance(self,columns):
 
-        # CHANGE THIS TO TRY CATCH STATEMENT
-        if self.__predict_has_been_called__:
-            return sorted(zip(self.model.feature_importances_,columns),reverse=True)
-        else:
-             raise ValueError('predict method has not been called yet')
+    def simulation_walkthrough(self, money, stocks):
+        """Runs a walkthrough simulation over x amount of days to see profits/losses along with model accuracy
 
-
-    def visualise(self):
-        
-        plt.plot(list(pred)*(prediction_window+1),color='red',label='Predictions')
-        plt.plot([starting_price]+list(Y_closing_prices[max(i,0):max(i,0)+prediction_window]),color='blue',label='Actual')
-        plt.legend()
-        plt.show()
-
-    def simulation_walkthrough(self):
-
+        Args:
+            money (int): Starting amount of money you are willing to invest 
+            stocks (int): Starting amount of stocks you currently have
+        """
+        self.money = money
+        self.stocks = stocks
         self.starting_money = self.money + self.stocks*self.X[self.n,3]
 
         self.preds = []
@@ -143,11 +144,25 @@ class ModelDev(data.Data):
         self.ending_money = self.money + self.stocks*self.Y_closing_prices[-1]
 
         print(f'The starting Money was {self.starting_money} and the ending money was {self.ending_money} so the total profit would have been: £{self.ending_money-self.starting_money}')
-        print(accuracy_score(self.acc,self.preds))
+        print(f'The accuracy of the model is: {accuracy_score(self.acc,self.preds)}')
 
         self.__simulation_walkthrough_has_been_called__ = True
 
+    def visualise_history(self):
+        """Visualises history of the stock in question for last n days up to todays date
+        """
+
+        # fix to plot actual dates on x
+        plt.plot(self.df['Close'])
+        n = len(self.df['Close'])
+        plt.title(f'History of closing prices for last {n} days', fontsize=20)
+        plt.xlabel('Day', fontsize=15)
+        plt.ylabel('Closing price', fontsize=15)
+        plt.show()
+
     def visualise_correct_incorrect_probs(self):
+        """Visualises the distribution of the predicted probabilities, can use to see whether to set a threshold for probability
+        """
 
         if self.__simulation_walkthrough_has_been_called__:
             pass
@@ -164,7 +179,6 @@ class ModelDev(data.Data):
             else:
                 incorrect.append(probs[0,1])
 
-        plt.style.use('seaborn')
         plt.boxplot(correct+incorrect, showfliers=False)
 
         data = [correct,incorrect]
@@ -180,12 +194,14 @@ class ModelDev(data.Data):
             plt.scatter(x,y,color=color, label=label)
 
         plt.xticks([1],[''])
-        plt.title('Distribution of both correct/incorrect predicted probabilities')
+        plt.title('Distribution of both correct/incorrect predicted probabilities', fontsize=20)
         plt.legend()
-        plt.ylabel('Predicted Probability of increasing')
+        plt.ylabel('Predicted Probability of increasing', fontsize=15)
         plt.show()
 
     def visualise_class_probs(self):
+        """Visualises the predicted probability distributions for each class, use to see whether one class is more accuracte than the other
+        """
 
         if self.__simulation_walkthrough_has_been_called__:
             pass
@@ -200,7 +216,6 @@ class ModelDev(data.Data):
             else:
                 decreased.append(probs[0,1])
 
-        plt.style.use('seaborn')
         data = [increased,decreased]
         plt.boxplot(data, showfliers=False)
 
@@ -210,9 +225,9 @@ class ModelDev(data.Data):
             plt.scatter(x,y)
 
         plt.xticks([1,2],['Increasing','Decreasing'])
-        plt.title('Predicted probability distributions of each class')
-        plt.xlabel('Actual Class')
-        plt.ylabel('Predicted Probability of increasing')
+        plt.title('Predicted probability distributions of each class', fontsize=20)
+        plt.xlabel('Actual Class', fontsize=15)
+        plt.ylabel('Predicted Probability of increasing', fontsize=15)
         plt.show()
 
     def predict(self):
@@ -225,6 +240,13 @@ class ModelDev(data.Data):
         pred = self.model.predict(self.X_current)
         
         return pred
+
+    def feature_importance(self,columns):
+
+        if self.__predict_has_been_called__:
+            return sorted(zip(self.model.feature_importances_,columns),reverse=True)
+        else:
+             raise ValueError('predict method has not been called yet')
 
 
 

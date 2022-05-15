@@ -19,6 +19,8 @@ class Data:
 
         self.__pull_yahoo_data()
         self.__feature_engineering()
+        self.__column_names()
+
 
     def __pull_yahoo_data(self):
         """Pulls in historical Yahoo finance data
@@ -50,14 +52,14 @@ class Data:
         # Add 30DayStockPriceSum
         self.df['30DayStockPriceSum'] = self.df.iloc[:,6:].sum(axis=1)
     
-    def column_names(self):
+    def __column_names(self):
         """Return the column names in order
 
         Returns:
             _type_: _description_
         """
 
-        return self.df.columns
+        self.column_names = self.df.columns
 
     def X_Y_dataset_creation(self):
         """Generates a typical XY inputs and targets 
