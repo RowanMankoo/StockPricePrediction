@@ -3,9 +3,8 @@ from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import xgboost as xgboost
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from xgboost import XGBClassifier
 
@@ -29,8 +28,15 @@ from scripts import data
 # try violin plot for visualise_class_probs
 
 class ModelDev(data.Data):
-    def __init__(self, company, steps, train_test_split=0.8, hyperparams=None):
+    def __init__(self, company, steps, hyperparams=None, train_test_split=0.8):
+        """Model class used for error analysis and so on
 
+        Args:
+            company (str): capital 4 letter company name as listed on Yahoo finance
+            steps (int): The number of days ahead our model will be trying to predict
+            train_test_split (float): How much of data to start training on before we start walkthrough prediction
+            hyperparams (dict): previously saved hyperparameters of model
+        """
         # Initialise data class and prepare data for model
         self.steps = steps
         super().__init__(company, steps)
@@ -63,7 +69,7 @@ class ModelDev(data.Data):
         return self.X[:self.n+i,:], self.Y[:self.n+i], self.X[self.n+i:,:], self.Y[self.n+i:], self.Y_closing_prices[self.n+i:]
 
     def __validate(self):
-        """Hyperparameter tuning
+        """Finds optimal hyperparameters and saves them in file called 'hyperparams.json'
         """
         X_train, Y_train, _,_,_ = self.__walkthrough_train_test_split(0)         
         params = {
@@ -101,7 +107,7 @@ class ModelDev(data.Data):
         return BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob
     
     def __money_simulation(self, BinaryPredicted, ActualStockClosingPrice):
-        """Calculates money loss/gain at a current walkthrough step
+        """Calculates money loss/gain at a current walkthrough step assuming basic trading strategy of selling of stock is predicted to decrease and buying if stock is predicted to increase
         """
 
         if BinaryPredicted==0:
@@ -230,16 +236,6 @@ class ModelDev(data.Data):
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
         plt.show()
 
-    def predict(self):
-
-        self.__predict_has_been_called__ = True
-
-        self.model = XGBClassifier(**self.best_params, scale_pos_weight=self.weighting)
-        self.model.fit(self.X, self.Y)
-
-        pred = self.model.predict(self.X_current)
-        
-        return pred
 
     def feature_importance(self,columns):
 
