@@ -17,7 +17,7 @@ from scripts import data
 # add more info to simulation info
 # polish final predict
 # Try new hyper parameter optimisation?
-# double check money simulation walkthrough
+# add hyperparam naming functionality
 ### include last 30 days of high?
 # Venv
 # progress bars or print init statements
@@ -26,6 +26,7 @@ from scripts import data
 # add fractional shares
 # add testing
 # try violin plot for visualise_class_probs
+
 
 class ModelDev(data.Data):
     def __init__(self, company, steps, hyperparams=None, train_test_split=0.8):
@@ -37,12 +38,15 @@ class ModelDev(data.Data):
             train_test_split (float): How much of data to start training on before we start walkthrough prediction
             hyperparams (dict): previously saved hyperparameters of model
         """
-        # Initialise data class and prepare data for model
+        # Store all arguments used to initalise class for later use when logging and throughout class methods
+        self.company = company
         self.steps = steps
+        self.train_test_split = train_test_split
+
         super().__init__(company, steps)
         self.X, self.Y, self.Y_closing_prices, self.X_current = self.X_Y_dataset_creation()
         self.X_current = self.X_current.reshape(-1,self.X_current.shape[0])
-        self.n = int(self.X.shape[0]*train_test_split)
+        self.n = int(self.X.shape[0]*self.train_test_split)
        
         # Used for class balancing 
         counter = Counter(self.Y)
@@ -50,7 +54,7 @@ class ModelDev(data.Data):
 
         # If there is no hyper parameter's given we use walkthrough validation to find optimal hyper parameters
         if hyperparams:
-            self.best_params = hyperparams
+            self.hyperparams = hyperparams
         else:
             self.__validate()
 
@@ -87,16 +91,16 @@ class ModelDev(data.Data):
                                 n_jobs = -1,
                                 verbose=True)
         xgb_grid.fit(X_train,Y_train)
-        self.best_params = xgb_grid.best_params_
+        self.hyperparams = xgb_grid.best_params_
 
         with open('hyperparams.json','w') as fp:
-            json.dump(self.best_params,fp)
+            json.dump(self.hyperparams,fp)
     
     def __train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
         """Trains an instance of our XGBoostClassifier at a current stage in our walkthrough training and then outputs prediction
         """
 
-        model = XGBClassifier(**self.best_params, scale_pos_weight=self.weighting)
+        model = XGBClassifier(**self.hyperparams, scale_pos_weight=self.weighting)
         model.fit(X_train, Y_train)
 
         BinaryPredicted = model.predict(X_test[0].reshape(-1,X_test.shape[1]))

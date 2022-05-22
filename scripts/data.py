@@ -4,6 +4,8 @@ import time
 import numpy as np
 import pandas as pd
 
+from logger_tools import logging_functions
+
 class Data:
     
     def __init__(self, company, steps):
@@ -20,7 +22,7 @@ class Data:
         self.__feature_engineering()
         self.__column_names()
 
-
+    @logging_functions.logging_decorator
     def __pull_yahoo_data(self):
         """Pulls in historical Yahoo finance data
         """
@@ -31,6 +33,7 @@ class Data:
         query_string = f'https://query1.finance.yahoo.com/v7/finance/download/{self.company}?period1={start_date}&period2={end_date}&interval={interval}&events=history&includeAdjustedClose=true'
         print(query_string)
         self.df = pd.read_csv(query_string)
+     
 
     def __feature_engineering(self):
         """Adds useful feature's for time series prediction

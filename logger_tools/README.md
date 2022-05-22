@@ -1,0 +1,1 @@
+note for logger to work all classes need to store variables used to initialise class as attributes in the init stage (for Model this is done via super().__init__)

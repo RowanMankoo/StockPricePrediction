@@ -21,6 +21,7 @@ outputs = m.predict()
 
 pred, prob = outputs[0][0], outputs[1]
 
+# Output to terminal
 print('-'*20)
 print('')
 if pred==1:
