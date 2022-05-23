@@ -9,23 +9,7 @@ from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from xgboost import XGBClassifier
 
 from scripts import data
-# develop feature importance functionality
-# only sell if probability is high
-# fixed training window
-# invest fixed amount of money
-# start date
-# add more info to simulation info
-# polish final predict
-# Try new hyper parameter optimisation?
-# add hyperparam naming functionality
-### include last 30 days of high?
-# Venv
-# progress bars or print init statements
-### ADD WEEKEND INDICATOR!
-# add classification statistics
-# add fractional shares
-# add testing
-# try violin plot for visualise_class_probs
+from logger_tools import logging_functions
 
 
 class ModelDev(data.Data):
@@ -63,7 +47,7 @@ class ModelDev(data.Data):
 
         plt.style.use('seaborn')
 
-
+    @logging_functions.logging_decorator
     def __walkthrough_train_test_split(self, i):
         """Splits dataset accoring to current step in walkthrough training programme
 
@@ -72,6 +56,7 @@ class ModelDev(data.Data):
         """
         return self.X[:self.n+i,:], self.Y[:self.n+i], self.X[self.n+i:,:], self.Y[self.n+i:], self.Y_closing_prices[self.n+i:]
 
+    @logging_functions.logging_decorator
     def __validate(self):
         """Finds optimal hyperparameters and saves them in file called 'hyperparams.json'
         """
@@ -95,7 +80,8 @@ class ModelDev(data.Data):
 
         with open('hyperparams.json','w') as fp:
             json.dump(self.hyperparams,fp)
-    
+
+    @logging_functions.logging_decorator   
     def __train_and_predict_step(self, X_train, Y_train, X_test, Y_test, Y_closing_prices_test):
         """Trains an instance of our XGBoostClassifier at a current stage in our walkthrough training and then outputs prediction
         """
@@ -110,6 +96,7 @@ class ModelDev(data.Data):
 
         return BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob
     
+    @logging_functions.logging_decorator
     def __money_simulation(self, BinaryPredicted, ActualStockClosingPrice):
         """Calculates money loss/gain at a current walkthrough step assuming basic trading strategy of selling of stock is predicted to decrease and buying if stock is predicted to increase
         """
@@ -126,6 +113,7 @@ class ModelDev(data.Data):
             self.stocks += self.money//ActualStockClosingPrice
             self.money -= (self.money//ActualStockClosingPrice)*ActualStockClosingPrice
 
+    @logging_functions.logging_decorator
     def simulation_walkthrough(self, money, stocks):
         """Runs a walkthrough simulation over x amount of days to see profits/losses along with model accuracy
 
@@ -158,6 +146,7 @@ class ModelDev(data.Data):
 
         self.__simulation_walkthrough_has_been_called__ = True
 
+    @logging_functions.logging_decorator
     def visualise_history(self):
         """Visualises history of the stock in question for last n days up to todays date
         """
@@ -170,6 +159,7 @@ class ModelDev(data.Data):
         plt.ylabel('Closing price', fontsize=15)
         plt.show()
 
+    @logging_functions.logging_decorator
     def visualise_correct_incorrect_probs(self):
         """Visualises the distribution of the predicted probabilities, can use to see whether to set a threshold for probability
         """
@@ -209,6 +199,7 @@ class ModelDev(data.Data):
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
         plt.show()
 
+    @logging_functions.logging_decorator
     def visualise_class_probs(self):
         """Visualises the predicted probability distributions for each class, use to see whether one class is more accuracte than the other
         """
@@ -240,7 +231,7 @@ class ModelDev(data.Data):
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
         plt.show()
 
-
+    @logging_functions.logging_decorator
     def feature_importance(self,columns):
 
         if self.__predict_has_been_called__:

@@ -2,15 +2,15 @@ import logging
 import json
 import functools
 import inspect
+import sys
 
+LOGGER = logging.getLogger(__name__)
+handler = logging.FileHandler('outputs1.log', mode='w')
+formatter = logging.Formatter('%(asctime)s - %(levelname)s -%(message)s')
+handler.setFormatter(formatter)
+LOGGER.addHandler(handler)
 
 def write_log(function_name, level, class_attributes=None, method_varibles=None, error_message=None ):
-    
-    LOGGER = logging.getLogger(__name__)
-    handler = logging.FileHandler('outputs.log', mode='w')
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s -%(message)s')
-    handler.setFormatter(formatter)
-    LOGGER.addHandler(handler)
     
     level_lookup = {
         'debug':10,
@@ -46,20 +46,27 @@ def logging_decorator(func):
 
         try:
             out = func(*args,**kwargs)
-            write_log(func.__name__,'error',class_attributes=class_attr,method_varibles=func_attr )
+            write_log(func.__name__,'info',class_attributes=class_attr,method_varibles=func_attr )
             return out
         except Exception as e:
-            write_log(func.__name__,level='info',class_attributes=class_attr, method_varibles=func_attr, error_message=e)
+            write_log(func.__name__,level='error',class_attributes=class_attr, method_varibles=func_attr, error_message=repr(e))
             raise
     return wrapper
  
 def __get_class_attributes(class_instance):
      # pulls attributes used to initalise class
 
+    # get names of params used to initalise the class
      sig = inspect.signature(class_instance.__init__)
      param_list = list(sig.parameters.keys())
      init_dict = {}
+     # match param names up with values used when initalising
      for param in param_list:
-         init_dict[param] = class_instance.__dict__[param] # make this more efficient?
+        # try all params of starting class, not all inherited classes will share these params
+        try:
+            init_dict[param] = class_instance.__dict__[param] # make this more efficient?
+        except:
+            continue
      return init_dict
+
 

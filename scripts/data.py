@@ -21,7 +21,7 @@ class Data:
         self.__pull_yahoo_data()
         self.__feature_engineering()
         self.__column_names()
-
+    
     @logging_functions.logging_decorator
     def __pull_yahoo_data(self):
         """Pulls in historical Yahoo finance data
@@ -33,8 +33,8 @@ class Data:
         query_string = f'https://query1.finance.yahoo.com/v7/finance/download/{self.company}?period1={start_date}&period2={end_date}&interval={interval}&events=history&includeAdjustedClose=true'
         print(query_string)
         self.df = pd.read_csv(query_string)
-     
 
+    @logging_functions.logging_decorator
     def __feature_engineering(self):
         """Adds useful feature's for time series prediction
         """
@@ -53,7 +53,8 @@ class Data:
 
         # Add 30DayStockPriceSum
         self.df['30DayStockPriceSum'] = self.df.iloc[:,6:].sum(axis=1)
-    
+
+    @logging_functions.logging_decorator
     def __column_names(self):
         """Return the column names in order
 
@@ -62,7 +63,8 @@ class Data:
         """
 
         self.column_names = self.df.columns
-
+    
+    @logging_functions.logging_decorator
     def X_Y_dataset_creation(self):
         """Generates a typical XY inputs and targets 
 
