@@ -43,7 +43,7 @@ def test_companies(company,steps,best_params):
                 'Steps':steps,
                 'Profit':profit}
     report = report.append(data,ignore_index=True)
-    report.to_csv('Report.csv',index=False)
+    report.to_csv('Report_1.csv',index=False)
 
     # If not errors assume test passes
     assert True

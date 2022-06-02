@@ -48,7 +48,7 @@ class Data:
                 continue
             else:
                 for j in range(1,31):
-                    self.df.loc[i,str(j)] = self.df.loc[i-j,'Close']
+                    self.df.loc[i,str(j)] = self.df.loc[i-j,'High']
         self.df = self.df.iloc[30:,:].drop(columns='Date') # lose first 30 days like this but oh well
 
         # Add 30DayStockPriceSum
