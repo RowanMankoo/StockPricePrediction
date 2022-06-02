@@ -28,3 +28,4 @@ add classification statistics
 add fractional shares
 add testing
 try violin plot for visualise_class_probs
+add report from pytest

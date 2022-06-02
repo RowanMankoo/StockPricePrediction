@@ -147,7 +147,7 @@ class ModelDev(data.Data):
         self.__simulation_walkthrough_has_been_called__ = True
 
     @logging_functions.logging_decorator
-    def visualise_history(self):
+    def visualise_history(self,test=False):
         """Visualises history of the stock in question for last n days up to todays date
         """
 
@@ -157,10 +157,13 @@ class ModelDev(data.Data):
         plt.title(f'History of closing prices for last {n} days', fontsize=20)
         plt.xlabel('Day', fontsize=15)
         plt.ylabel('Closing price', fontsize=15)
+        
+        if test:
+            return
         plt.show()
 
     @logging_functions.logging_decorator
-    def visualise_correct_incorrect_probs(self):
+    def visualise_correct_incorrect_probs(self,test=False):
         """Visualises the distribution of the predicted probabilities, can use to see whether to set a threshold for probability
         """
 
@@ -197,10 +200,13 @@ class ModelDev(data.Data):
         plt.title('Distribution of both correct/incorrect predicted probabilities', fontsize=20)
         plt.legend()
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
+        
+        if test:
+            return
         plt.show()
 
     @logging_functions.logging_decorator
-    def visualise_class_probs(self):
+    def visualise_class_probs(self,test=False):
         """Visualises the predicted probability distributions for each class, use to see whether one class is more accuracte than the other
         """
 
@@ -229,6 +235,9 @@ class ModelDev(data.Data):
         plt.title('Predicted probability distributions of each class', fontsize=20)
         plt.xlabel('Actual Class', fontsize=15)
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
+        
+        if test:
+            return
         plt.show()
 
     @logging_functions.logging_decorator
