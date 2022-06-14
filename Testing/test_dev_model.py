@@ -35,15 +35,15 @@ def test_companies(company,steps,best_params):
     m.visualise_history(test=True)
 
     # Create/add to report.csv
-    if exists('Report.csv'):
-        report = pd.read_csv('Report.csv')
+    if exists('Report_1.csv'):
+        report = pd.read_csv('Report_1.csv')
     else:
         report = pd.DataFrame(columns = ['Company','Steps','Profit'])
     data = {'Company':company,
                 'Steps':steps,
                 'Profit':profit}
     report = report.append(data,ignore_index=True)
-    report.to_csv('Report.csv',index=False)
+    report.to_csv('Report_1.csv',index=False)
 
     # If not errors assume test passes
     assert True
