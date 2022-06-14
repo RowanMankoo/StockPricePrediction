@@ -4,8 +4,8 @@ from os.path import exists
 import pytest
 from scripts import model
 
-companies = ['MSFT','COKE','AAPL','TSLA','BARC.L']
-steps = [2,3,4,5,6]
+companies = ['MSFT','COKE','AAPL','TSLA','BARC.L','GOOG','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC']
+steps = 5*len(companies)
 path_to_hyperparams = r'hyperparams.json'         # Set this if you wish to test validate method for each model also, note this will vastly increase testing time
 
 # Load in Hyperparams if stated else set to None
