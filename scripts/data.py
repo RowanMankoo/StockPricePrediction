@@ -49,7 +49,12 @@ class Data:
             else:
                 for j in range(1,31):
                     self.df.loc[i,str(j)] = self.df.loc[i-j,'High']
-        self.df = self.df.iloc[30:,:].drop(columns='Date') # lose first 30 days like this but oh well
+        self.df = self.df.iloc[30:,:] # lose first 30 days like this but oh well
+
+        # datetime.datetime.strptime('2019-06-12','%Y-%m-%d').weekday()
+        self.df['Weekday_indicator'] = self.df['Date'].apply(lambda x: datetime.datetime.strptime(x,'%Y-%m-%d').weekday())
+        # Drop the date
+        self.df = self.df.drop(columns='Date')
 
         # Add 30DayStockPriceSum
         self.df['30DayStockPriceSum'] = self.df.iloc[:,6:].sum(axis=1)

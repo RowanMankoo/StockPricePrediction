@@ -20,7 +20,6 @@ add more info to simulation info
 polish final predict
 Try new hyper parameter optimisation?
 add hyperparam naming functionality
-include last 30 days of high?
 Venv
 progress bars or print init statements
 ADD WEEKEND INDICATOR!
@@ -28,4 +27,3 @@ add classification statistics
 add fractional shares
 add testing
 try violin plot for visualise_class_probs
-add report from pytest
