@@ -13,7 +13,7 @@ from logger_tools import logging_functions
 
 
 class ModelDev(data.Data):
-    def __init__(self, company, steps, hyperparams=None, train_test_split=0.8):
+    def __init__(self, company, steps, training_window, hyperparams=None, train_test_split=0.8):
         """Model class used for error analysis and so on
 
         Args:
@@ -25,12 +25,11 @@ class ModelDev(data.Data):
         # Store all arguments used to initalise class for later use when logging and throughout class methods
         self.company = company
         self.steps = steps
-        self.train_test_split = train_test_split
+        self.training_window = training_window
 
         super().__init__(company, steps)
         self.X, self.Y, self.Y_closing_prices, self.X_current = self.X_Y_dataset_creation()
         self.X_current = self.X_current.reshape(-1,self.X_current.shape[0])
-        self.n = int(self.X.shape[0]*self.train_test_split)
        
         # Used for class balancing 
         counter = Counter(self.Y)
@@ -49,12 +48,12 @@ class ModelDev(data.Data):
 
     @logging_functions.logging_decorator
     def __walkthrough_train_test_split(self, i):
-        """Splits dataset accoring to current step in walkthrough training programme
+        """Splits dataset according to current step in walkthrough training programme
 
         Returns:
             X_train, Y_train, X_test, Y_test, Y_closing_pries_test
         """
-        return self.X[:self.n+i,:], self.Y[:self.n+i], self.X[self.n+i:,:], self.Y[self.n+i:], self.Y_closing_prices[self.n+i:]
+        return self.X[i:self.training_window+i,:], self.Y[i:self.training_window+i], self.X[self.training_window+i:,:], self.Y[self.training_window+i:], self.Y_closing_prices[self.training_window+i:]
 
     @logging_functions.logging_decorator
     def __validate(self):
@@ -123,12 +122,12 @@ class ModelDev(data.Data):
         """
         self.money = money
         self.stocks = stocks
-        self.starting_money = self.money + self.stocks*self.X[self.n,3]
+        self.starting_money = self.money + self.stocks*self.X[0,3]
 
         self.preds = []
         self.acc = []
         self.probs = []
-        for i in range(0,self.X.shape[0]-self.n,self.steps):
+        for i in range(0,self.X.shape[0]-self.training_window,self.steps):
 
             X_train, Y_train, X_test, Y_test, Y_closing_pries_test = self.__walkthrough_train_test_split(i)
             BinaryPredicted, BinaryActual, ActualStockClosingPrice, prob = self.__train_and_predict_step(X_train, Y_train, X_test, Y_test, Y_closing_pries_test)

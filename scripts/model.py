@@ -4,7 +4,7 @@ from scripts import modeldev
 from logger_tools import logging_functions
 
 class Model(modeldev.ModelDev):
-    def __init__(self, company, steps, hyperparams=None, train_test_split=0.8):
+    def __init__(self, company, steps,training_window, hyperparams=None):
         """Model class used for error analysis and so on
 
         Args:
@@ -13,7 +13,7 @@ class Model(modeldev.ModelDev):
             train_test_split (float): How much of data to start training on before we start walkthrough prediction (ONLY USED FOR MODELDEV)
             hyperparams (dict): previously saved hyperparameters of model
         """
-        super().__init__(company, steps, train_test_split=train_test_split, hyperparams=hyperparams)
+        super().__init__(company, steps, training_window=training_window, hyperparams=hyperparams)
     
     @logging_functions.logging_decorator
     def predict(self):
@@ -25,8 +25,14 @@ class Model(modeldev.ModelDev):
         """
 
         self.model = XGBClassifier(**self.hyperparams, scale_pos_weight=self.weighting)
-        self.model.fit(self.X, self.Y)
 
+        # Create training window
+        X_window = self.X[-self.training_window:,:]
+        Y_window = self.Y[-self.training_window:
+        
+        # Train and predict
+        self.model.fit(X_window, Y_window)
         pred = self.model.predict(self.X_current)
         prob = self.model.predict_proba(self.X_current)
+        
         return pred, prob

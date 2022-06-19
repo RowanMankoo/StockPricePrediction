@@ -57,7 +57,7 @@ class Data:
         self.df = self.df.drop(columns='Date')
 
         # Add 30DayStockPriceSum
-        self.df['30DayStockPriceSum'] = self.df.iloc[:,6:].sum(axis=1)
+        self.df['30DayStockPriceSum'] = self.df.filter(regex='\d').sum(axis=1)
 
     @logging_functions.logging_decorator
     def __column_names(self):
