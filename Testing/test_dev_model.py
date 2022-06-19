@@ -8,6 +8,7 @@ from scripts import modeldev
 companies = ['MSFT','COKE','AAPL','TSLA','BARC.L','GOOG','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC']
 steps = [5]*len(companies)
 path_to_hyperparams = r'hyperparams.json'         # Set this if you wish to test validate method for each model also, note this will vastly increase testing time
+path_to_hyperparams = None        # Set this if you wish to test validate method for each model also, note this will vastly increase testing time
 
 # Load in Hyperparams if stated else set to None
 if path_to_hyperparams == None:
@@ -35,15 +36,15 @@ def test_companies(company,steps,best_params):
     m.visualise_history(test=True)
 
     # Create/add to report.csv
-    if exists('Report_1.csv'):
-        report = pd.read_csv('Report_1.csv')
+    if exists('Report.csv'):
+        report = pd.read_csv('Report.csv')
     else:
         report = pd.DataFrame(columns = ['Company','Steps','Profit'])
     data = {'Company':company,
                 'Steps':steps,
                 'Profit':profit}
     report = report.append(data,ignore_index=True)
-    report.to_csv('Report_1.csv',index=False)
+    report.to_csv('Report.csv',index=False)
 
     # If not errors assume test passes
     assert True
