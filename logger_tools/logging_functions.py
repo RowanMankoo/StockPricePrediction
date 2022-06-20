@@ -5,7 +5,7 @@ import inspect
 import sys
 
 LOGGER = logging.getLogger(__name__)
-handler = logging.FileHandler('outputs1.log', mode='w')
+handler = logging.FileHandler('Outputs/output.log', mode='w')
 formatter = logging.Formatter('%(asctime)s - %(levelname)s -%(message)s')
 handler.setFormatter(formatter)
 LOGGER.addHandler(handler)

@@ -1,5 +1,8 @@
 import json
 from collections import Counter
+import os
+import inspect
+import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,13 +16,13 @@ from logger_tools import logging_functions
 
 
 class ModelDev(data.Data):
-    def __init__(self, company, steps, training_window, hyperparams=None, train_test_split=0.8):
+    def __init__(self, company, steps, training_window, hyperparams=None):
         """Model class used for error analysis and so on
 
         Args:
             company (str): capital 4 letter company name as listed on Yahoo finance
             steps (int): The number of days ahead our model will be trying to predict
-            train_test_split (float): How much of data to start training on before we start walkthrough prediction
+            training_window (float): How many observations to include in trinaing window
             hyperparams (dict): previously saved hyperparameters of model
         """
         # Store all arguments used to initalise class for later use when logging and throughout class methods
@@ -43,6 +46,10 @@ class ModelDev(data.Data):
 
         # Fix this to be more neet
         self.__simulation_walkthrough_has_been_called__ = False
+
+        # Make path to store 'visualise_*' plots
+        if not os.path.exists('Outputs/'+self.company):
+            os.mkdir('Outputs/'+self.company)
 
         plt.style.use('seaborn')
 
@@ -146,7 +153,7 @@ class ModelDev(data.Data):
         self.__simulation_walkthrough_has_been_called__ = True
 
     @logging_functions.logging_decorator
-    def visualise_history(self,test=False):
+    def visualise_history(self):
         """Visualises history of the stock in question for last n days up to todays date
         """
 
@@ -156,13 +163,15 @@ class ModelDev(data.Data):
         plt.title(f'History of closing prices for last {n} days', fontsize=20)
         plt.xlabel('Day', fontsize=15)
         plt.ylabel('Closing price', fontsize=15)
-        
-        if test:
-            return
-        plt.show()
+
+        # save plot to Outputs
+        save_path = os.path.join('Outputs/'+self.company, inspect.stack()[0][3]+'-'+datetime.date.today().strftime('%Y_%m_%d')+'.png')
+        plt.savefig(save_path)
+        plt.close()
+
 
     @logging_functions.logging_decorator
-    def visualise_correct_incorrect_probs(self,test=False):
+    def visualise_correct_incorrect_probs(self):
         """Visualises the distribution of the predicted probabilities, can use to see whether to set a threshold for probability
         """
 
@@ -200,12 +209,14 @@ class ModelDev(data.Data):
         plt.legend()
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
         
-        if test:
-            return
-        plt.show()
+        # save plot to Outputs
+        save_path = os.path.join('Outputs/'+self.company, inspect.stack()[0][3]+'-'+datetime.date.today().strftime('%Y_%m_%d')+'.png')
+        plt.savefig(save_path)
+        plt.close()
+
 
     @logging_functions.logging_decorator
-    def visualise_class_probs(self,test=False):
+    def visualise_class_probs(self):
         """Visualises the predicted probability distributions for each class, use to see whether one class is more accuracte than the other
         """
 
@@ -235,9 +246,11 @@ class ModelDev(data.Data):
         plt.xlabel('Actual Class', fontsize=15)
         plt.ylabel('Predicted Probability of increasing', fontsize=15)
         
-        if test:
-            return
-        plt.show()
+        # save plot to Outputs
+        save_path = os.path.join('Outputs/'+self.company, inspect.stack()[0][3]+'-'+datetime.date.today().strftime('%Y_%m_%d')+'.png')
+        plt.savefig(save_path)
+        plt.close()
+
 
     @logging_functions.logging_decorator
     def feature_importance(self,columns):

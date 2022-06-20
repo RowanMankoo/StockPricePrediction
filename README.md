@@ -14,7 +14,6 @@
 
 develop feature importance functionality
 only sell if probability is high
-fixed training window
 start date
 add more info to simulation info
 polish final predict
@@ -22,8 +21,7 @@ Try new hyper parameter optimisation?
 add hyperparam naming functionality
 Venv
 progress bars or print init statements
-ADD WEEKEND INDICATOR!
 add classification statistics
 add fractional shares
-add testing
+test main.py
 try violin plot for visualise_class_probs

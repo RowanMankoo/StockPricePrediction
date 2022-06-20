@@ -1,5 +1,6 @@
 import json
 from os.path import exists
+import datetime
 
 import pandas as pd
 import pytest
@@ -34,21 +35,21 @@ def test_companies(company,steps,best_params):
     profit = m.ending_money-m.starting_money
 
     # Test visualisations
-    m.visualise_correct_incorrect_probs(test=True)
-    m.visualise_class_probs(test=True)
-    m.visualise_history(test=True)
+    m.visualise_correct_incorrect_probs()
+    m.visualise_class_probs()
+    m.visualise_history()
 
     # Create/add to report.csv
     try:
-        if exists('Report_3.csv'):
-            report = pd.read_csv('Report_3.csv')
+        if exists('Outputs/Report_3_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv'):
+            report = pd.read_csv('Outputs/Report_3_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv')
         else:
             report = pd.DataFrame(columns = ['Company','Steps','Profit'])
         data = {'Company':company,
                     'Steps':steps,
                     'Profit':profit}
         report = report.append(data,ignore_index=True)
-        report.to_csv('Report_3.csv',index=False)
+        report.to_csv('Outputs/Report_3_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv',index=False)
 
         logging_functions.write_log('Report_creation','info',class_attributes={'company':company,'steps':steps})
     except Exception as e:

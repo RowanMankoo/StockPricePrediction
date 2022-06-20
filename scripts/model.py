@@ -10,7 +10,7 @@ class Model(modeldev.ModelDev):
         Args:
             company (str): capital 4 letter company name as listed on Yahoo finance
             steps (int): The number of days ahead our model will be trying to predict
-            train_test_split (float): How much of data to start training on before we start walkthrough prediction (ONLY USED FOR MODELDEV)
+            training_window (float): How many observations to include in trinaing window
             hyperparams (dict): previously saved hyperparameters of model
         """
         super().__init__(company, steps, training_window=training_window, hyperparams=hyperparams)
