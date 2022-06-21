@@ -14,14 +14,22 @@
 
 develop feature importance functionality
 only sell if probability is high
-start date
 add more info to simulation info
 polish final predict
 Try new hyper parameter optimisation?
 add hyperparam naming functionality
 Venv
 progress bars or print init statements
-add classification statistics
+##add classification statistics
 add fractional shares
 test main.py
 try violin plot for visualise_class_probs
+neaten up config on report path/name and also report for other pytest? / merge them together??
+early stoppiing for xgboost?
+## validate on year prior?
+## money sim on last year in report but get threshold basewd on most data avalible?
+add validation to set threshold?
+# Run pytest to see if changing threshold is acxc making a diff
+# Why is number of predictions so small?
+
+f1score, 1 year window

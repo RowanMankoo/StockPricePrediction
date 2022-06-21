@@ -7,7 +7,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import xgboost as xgboost
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from xgboost import XGBClassifier
 
@@ -119,6 +119,7 @@ class ModelDev(data.Data):
             self.stocks += self.money//ActualStockClosingPrice
             self.money -= (self.money//ActualStockClosingPrice)*ActualStockClosingPrice
 
+
     @logging_functions.logging_decorator
     def simulation_walkthrough(self, money, stocks):
         """Runs a walkthrough simulation over x amount of days to see profits/losses along with model accuracy
@@ -151,6 +152,34 @@ class ModelDev(data.Data):
         print(f'The accuracy of the model is: {accuracy_score(self.acc,self.preds)}')
 
         self.__simulation_walkthrough_has_been_called__ = True
+        self.__calculate_threshold()
+
+    
+    @logging_functions.logging_decorator
+    def __calculate_threshold(self):
+        """Calculates the threshold to be used for final model based on maximising the F1-score on the simulation_walkthrough tests
+        """
+        thresholds = np.arange(0, 1, 0.001)
+        positive_probs = np.array([x[0][1] for x in self.probs])
+
+        # apply threshold to positive probabilities to create labels
+        def to_labels(threshold):
+            return (positive_probs >= threshold).astype('int')
+
+        # evaluate each threshold
+        scores = [f1_score(self.acc, to_labels(t)) for t in thresholds]
+        # get best threshold
+        indx = np.argmax(scores)
+
+        if thresholds[indx]==0 or  thresholds[indx]==1:
+            # If thresholds being set to 0 or 1, set threshold to standard 0.5
+            self.threshold = 0.5
+            self.f1_test_score = f1_score(self.acc,self.preds)
+        else:
+            self.threshold = thresholds[indx]
+            self.f1_test_score = scores[indx]
+
+
 
     @logging_functions.logging_decorator
     def visualise_history(self):

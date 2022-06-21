@@ -27,7 +27,7 @@ class Data:
         """Pulls in historical Yahoo finance data
         """
 
-        start_date = int(time.mktime(datetime.datetime(2019,6,13).timetuple())) # automate this to a 3 month period 
+        start_date = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days=3*365)).timetuple()))
         end_date = int(time.time())
         interval = '1d' #1d 1wk 1m
         query_string = f'https://query1.finance.yahoo.com/v7/finance/download/{self.company}?period1={start_date}&period2={end_date}&interval={interval}&events=history&includeAdjustedClose=true'

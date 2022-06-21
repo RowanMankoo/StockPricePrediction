@@ -1,0 +1,1 @@
+Outputs from things such as plots, logs, reports and so on will be stored here

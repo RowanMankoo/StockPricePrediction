@@ -4,6 +4,8 @@ import datetime
 
 import pandas as pd
 import pytest
+from sklearn.metrics import f1_score
+
 from scripts import modeldev
 from logger_tools import logging_functions
 
@@ -32,8 +34,12 @@ def test_companies(company,steps,best_params):
 
     m = modeldev.ModelDev(company=company, steps=steps, training_window=150, hyperparams=best_params)
     m.simulation_walkthrough(1000,0)
+    # Report summary metrics
     profit = m.ending_money-m.starting_money
-
+    f1_score_acc = f1_score(m.acc,m.preds)
+    f1_score_possible = m.f1_test_score
+    threshold = m.threshold
+    
     # Test visualisations
     m.visualise_correct_incorrect_probs()
     m.visualise_class_probs()
@@ -41,15 +47,18 @@ def test_companies(company,steps,best_params):
 
     # Create/add to report.csv
     try:
-        if exists('Outputs/Report_3_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv'):
-            report = pd.read_csv('Outputs/Report_3_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv')
+        if exists('Outputs/Report_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv'):
+            report = pd.read_csv('Outputs/Report_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv')
         else:
-            report = pd.DataFrame(columns = ['Company','Steps','Profit'])
+            report = pd.DataFrame(columns = ['Company','Steps','Profit', 'F1-Score'])
         data = {'Company':company,
                     'Steps':steps,
-                    'Profit':profit}
+                    'Profit':profit,
+                    'F1-Score_acc':f1_score_acc,
+                    'F1_Score_possible':f1_score_possible,
+                    'Threshold':threshold}
         report = report.append(data,ignore_index=True)
-        report.to_csv('Outputs/Report_3_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv',index=False)
+        report.to_csv('Outputs/Report_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv',index=False)
 
         logging_functions.write_log('Report_creation','info',class_attributes={'company':company,'steps':steps})
     except Exception as e:

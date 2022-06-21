@@ -28,7 +28,7 @@ class Model(modeldev.ModelDev):
 
         # Create training window
         X_window = self.X[-self.training_window:,:]
-        Y_window = self.Y[-self.training_window:
+        Y_window = self.Y[-self.training_window:]
         
         # Train and predict
         self.model.fit(X_window, Y_window)
