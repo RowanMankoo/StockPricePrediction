@@ -1,7 +1,6 @@
-note for logger to work all classes need to store variables used to initialise class as attributes in the init stage (for Model this is done via super().__init__)
+If you plan on building upon this repo then you must ensure two things for the logging capabilities to continue to work:
 
-note variables used for init must be labelled same thing acrosss child classes for logging to work
-
-depending on how detailed you want logs you can delete some of the logging decorators from each class method which will be repeated multiple times
+1. All classes need to store variables used to initialise class as attributes in the init stage (for Model this is done via super().__init__)
+2. Varibles used to initalise a parent class must share the same name across child classes
 
  

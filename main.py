@@ -16,7 +16,10 @@ elif exists(path_to_hyperparams):
 else:
     raise ValueError('Please enter a correct path')
 
-m = model.Model(company,steps,best_params)
+m = model.Model(company=company,
+                steps=steps,
+                training_window=150,
+                hyperparams=best_params)
 outputs = m.predict()
 
 pred, prob = outputs[0][0], outputs[1]

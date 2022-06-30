@@ -16,7 +16,7 @@ from logger_tools import logging_functions
 
 
 class ModelDev(data.Data):
-    def __init__(self, company, steps, training_window, hyperparams=None):
+    def __init__(self, company, steps, training_window=150, hyperparams=None):
         """Model class used for error analysis and so on
 
         Args:

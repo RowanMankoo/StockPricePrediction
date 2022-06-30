@@ -4,7 +4,7 @@ from scripts import modeldev
 from logger_tools import logging_functions
 
 class Model(modeldev.ModelDev):
-    def __init__(self, company, steps,training_window, hyperparams=None):
+    def __init__(self, company, steps,training_window=150, hyperparams=None):
         """Model class used for error analysis and so on
 
         Args:
@@ -13,7 +13,7 @@ class Model(modeldev.ModelDev):
             training_window (float): How many observations to include in trinaing window
             hyperparams (dict): previously saved hyperparameters of model
         """
-        super().__init__(company, steps, training_window=training_window, hyperparams=hyperparams)
+        super().__init__(company=company, steps=steps, training_window=training_window, hyperparams=hyperparams)
     
     @logging_functions.logging_decorator
     def predict(self):
