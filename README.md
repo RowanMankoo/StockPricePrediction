@@ -1,48 +1,10 @@
-# Stock Reading Price Prediction
-
-- xgboost classification which classifies momentum of stocks after n days
-- previous 30 days closing prices added
-- pulls in yahoo finance data
-- includes a money simulation which will use walkthrough training to estimate how much money you would gain/lose after x days of trading with standard stratergy
-- can stor hyper params as takes long to find them
-- can show feature importance
-- deales with class imbalance
-
-'added class balancing technique along with visulisation method of predicted probabilities'
-
-## To Do
-
-develop feature importance functionality
-only sell if probability is high
-add more info to simulation info
-polish final predict
-Try new hyper parameter optimisation?
-add hyperparam naming functionality
-Venv
-progress bars or print init statements
-##add classification statistics
-add fractional shares
-test main.py
-try violin plot for visualise_class_probs
-neaten up config on report path/name and also report for other pytest? / merge them together??
-early stoppiing for xgboost?
-## validate on year prior?
-## money sim on last year in report but get threshold basewd on most data avalible?
-add validation to set threshold?
-# Run pytest to see if changing threshold is acxc making a diff
-# Why is number of predictions so small?
-# Weight latte observations more
-# test_model output predictions in a report
-f1score, 1 year window
-
-
 # Repo Structure
 
 - **logger_tools** contains the logging functions used throughout all scripts in this repo
 - **Outputs** is currents an empty folder but will be populated once either the testing scrips are ran or any of the visualise_* methods in modeldev.py
 - **Testing** contains all pytest scripts which can be ran to generate reports of the algorithm peformance
 - **scripts** contains the python scripts necessary to run the stock price prediction
-
+- main.py is the script to be ran for a paticular company if you wish to get the prediction 
 # Time series prediction
 
 Typically when faced with time-series forecasting you will often see models two types of models being used. The first is the classical fmaily of models which all use different variants of Moving Average, Smoothing and Autoregression. The second option is modern deep learning approaches for sequential data such as RNN's,LSTM's, Transformers and so on. Each option has advantages and disadvantages such as the large data requirment for deep learning approaches 

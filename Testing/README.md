@@ -6,4 +6,4 @@ This is a very simple test script which will test the model to see if it can out
 
 # test_dev_model
 
-This script will run tests on all of the evaluation methods methods of the the ModelDev class. Whilst doing this a report will be generated for each company used in the test cases.
+This script will run tests on all of the evaluation methods methods of the the ModelDev class. Whilst doing this a report will be generated for each company used in the test cases. If you wish to get a summary of all the visulaisations and run the simulation for a paticular combination of companies alter the config at the start of this script.
