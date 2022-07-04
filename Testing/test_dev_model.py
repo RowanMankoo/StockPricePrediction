@@ -10,7 +10,7 @@ from scripts import modeldev
 from logger_tools import logging_functions
 
 config = {
-    'companies': ['MSFT','COKE','AAPL','TSLA','BARC.L','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC'],
+    'companies': ['MSFT','COKE','AAPL','TSLA','BARC.L','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC','SONY'],
     'path_to_hyperparams': r'hyperparams.json'
 }
 steps = [5]*len(config['companies'])

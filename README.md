@@ -25,7 +25,26 @@ As market trends will chanage a fixed window was used of the last *n* number of 
 
 # Report
 
-We ran simulations on 15 different companies investing £1000 into each one over a 3 year period and the table below shows the profits made by doing this
+We ran simulations on 15 different companies investing £1000 into each one over a 3 year period and the table below shows the profits made by doing this:
+
+|Company|Steps|Profit (£)           |
+|-------|-----|-------------------|
+|MSFT   |5    |233.40        |
+|COKE   |5    |36.15 |
+|AAPL   |5    |511.14  |
+|TSLA   |5    |2258.11 |
+|BARC.L |5    |556.31  |
+|AMZN   |5    |-111.73 |
+|NVDA   |5    |853.14  |
+|XOM    |5    |156.89 |
+|JPM    |5    |123.61 |
+|WMT    |5    |116.29 |
+|PFE    |5    |542.67  |
+|DIS    |5    |-155.58|
+|CSCO   |5    |-40.90|
+|INTC   |5    |-339.92|
+|SONY   |5    |581.33 |
+
 # Experiments Ran
 
 - Thresholding o F1 score fail
