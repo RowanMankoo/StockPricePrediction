@@ -10,8 +10,7 @@ from scripts import modeldev
 from logger_tools import logging_functions
 
 config = {
-    'report_name':'Report_3.csv',
-    'companies': ['MSFT','COKE','AAPL','TSLA','BARC.L','GOOG','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC'],
+    'companies': ['MSFT','COKE','AAPL','TSLA','BARC.L','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC'],
     'path_to_hyperparams': r'hyperparams.json'
 }
 steps = [5]*len(config['companies'])
@@ -36,11 +35,8 @@ def test_companies(company,steps,best_params):
     m.simulation_walkthrough(1000,0)
     # Report summary metrics
     profit = m.ending_money-m.starting_money
-    f1_score_acc = f1_score(m.acc,m.preds)
-    f1_score_possible = m.f1_test_score
-    threshold = m.threshold
     
-    # Test visualisations
+    # Test visualisations and store them in Outputs
     m.visualise_correct_incorrect_probs()
     m.visualise_class_probs()
     m.visualise_history()
@@ -50,13 +46,11 @@ def test_companies(company,steps,best_params):
         if exists('Outputs/Report_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv'):
             report = pd.read_csv('Outputs/Report_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv')
         else:
-            report = pd.DataFrame(columns = ['Company','Steps','Profit', 'F1-Score'])
+            report = pd.DataFrame(columns = ['Company','Steps','Profit'])
         data = {'Company':company,
                     'Steps':steps,
-                    'Profit':profit,
-                    'F1-Score_acc':f1_score_acc,
-                    'F1_Score_possible':f1_score_possible,
-                    'Threshold':threshold}
+                    'Profit':profit
+                    }
         report = report.append(data,ignore_index=True)
         report.to_csv('Outputs/Report_'+datetime.date.today().strftime('%Y_%m_%d')+'.csv',index=False)
 

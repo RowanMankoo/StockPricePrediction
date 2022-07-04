@@ -6,7 +6,7 @@ from scripts import model
 
 config = {
     'report_name':'Report_3.csv',
-    'companies': ['MSFT','COKE','AAPL','TSLA','BARC.L','GOOG','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC'],
+    'companies': ['MSFT','COKE','AAPL','TSLA','BARC.L','AMZN','NVDA','XOM','JPM','WMT','PFE','DIS','CSCO','INTC'],
     'path_to_hyperparams': r'hyperparams.json'
 }
 steps = [5]*len(config['companies'])
